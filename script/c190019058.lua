@@ -15,7 +15,7 @@ end
 
 function s.spfilter (c,e,tp)
     return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-    and ((c:IsCode(16006013|160022000)) or (c:IsType(TYPE_FUSION) and c:IsLevelAbove(8) and c:IsAttribute(ATTRIBUTE_WIND)))
+    and ((c:IsCode(160006013, 160022000)) or (c:IsType(TYPE_FUSION) and c:IsLevelAbove(8) and c:IsAttribute(ATTRIBUTE_WIND)))
 end
 
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -27,7 +27,7 @@ end
 
 function s.operation (e,tp,eg,ep,ev,re,r,rp)
     -- effect
-  if Duel.GetLocationCount(LOCATION_MZONE)<=0 then return end
+  if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
   Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
   local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
   if #g>0 then
