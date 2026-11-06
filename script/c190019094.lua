@@ -20,23 +20,24 @@ end
 
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local cg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE,0,nil)
-	if chk==0 then return aux.SelectUnselectGroup(cg,e,tp,3,3,0) end
+	if chk==0 then return aux.SelectUnselectGroup(cg,e,tp,3,3,nil) end
+     
 end
 
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tdg=Duel.GetMatchingGroup(Card.IsExists,tp,0,LOCATION_STZONE,nil)
+	local tdg=Duel.GetMatchingGroup(nil,tp,0,LOCATION_STZONE,nil)
 	if chk==0 then return #tdg>0 end
 end
 
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	--Requirement
 	local cg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE,0,nil)
-	local g=aux.SelectUnselectGroup(cg,e,tp,3,3,1,tp,HINTMSG_TODECK)
+	local g=aux.SelectUnselectGroup(cg,e,tp,3,3,nil,1,tp,HINTMSG_TODECK)
 	Duel.HintSelection(g)
 	if Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)<1 then return end
 	--Effect
-	local tdg=Duel.GetMatchingGroup(Card.IsExists,tp,0,LOCATION_STZONE,nil)
-	if #dg>0 then
+	local tdg=Duel.GetMatchingGroup(nil,tp,0,LOCATION_STZONE,nil)
+	if #tdg>0 then
 		local sg=tdg:Select(tp,1,1,nil)
 		Duel.HintSelection(sg)
 		Duel.SendtoDeck(sg,REASON_EFFECT)
