@@ -40,6 +40,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if #tdg>0 then
 		local sg=tdg:Select(tp,1,1,nil)
 		Duel.HintSelection(sg)
-		Duel.SendtoDeck(sg,REASON_EFFECT)
+		Duel.SendtoDeck(sg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end
