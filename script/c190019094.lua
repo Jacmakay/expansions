@@ -20,7 +20,7 @@ end
 
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local cg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE,0,nil)
-	if chk==0 then return aux.SelectUnselectGroup(cg,e,tp,3,3,nil) end
+	if chk==0 then return aux.SelectUnselectGroup(cg,e,tp,3,3,nil,0) end
      
 end
 
