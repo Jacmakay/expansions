@@ -36,7 +36,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local tg=Duel.SelectMatchingCard(tp,LOCATION_HAND|LOCATION_MZONE,0,1,1,nil)
+	local tg=Duel.SelectMatchingCard(tp,IsAbleToGraveAsCost,LOCATION_HAND|LOCATION_MZONE,0,1,1,nil)
 	if Duel.SendtoGrave(tg,REASON_COST)<1 then return end
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
     local g=Duel.SelectMatchingCard(tp,Card.IsCanChangePositionRush,tp,0,LOCATION_MZONE,1,1,nil)
