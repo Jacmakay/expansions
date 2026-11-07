@@ -71,11 +71,11 @@ function s.thfilter(c)
 		and c:IsAbleToHand()
 end
 
--- Replace this ID if your "Hand's Combination Technique" card uses a different ID.
+-- Actual card ID for "Hand's Combination Technique".
 s.hand_combination_technique=190019029
 
 function s.techfilter(c)
-	return c:IsCode(s.hand_combination_technique) and c:IsAbleToHand()
+	return c:IsOriginalCode(s.hand_combination_technique) and c:IsAbleToHand()
 end
 
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -96,12 +96,12 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 
 	-- Also, optionally add "Hand's Combination Technique" from GY.
-	if Duel.IsExistingMatchingCard(s.techfilter,tp,LOCATION_GRAVE,0,1,nil)
-		and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	-- Selecting 0 cards skips this optional addition; this avoids requiring
+	-- a custom aux.Stringid(id,0) prompt to be present in the card database.
+	if Duel.IsExistingMatchingCard(s.techfilter,tp,LOCATION_GRAVE,0,1,nil) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local g=Duel.SelectMatchingCard(tp,s.techfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-		if #g>0 then
-			Duel.SendtoHand(g,nil,REASON_EFFECT)
+		local g=Duel.SelectMatchingCard(tp,s.techfilter,tp,LOCATION_GRAVE,0,0,1,nil)
+		if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
 			Duel.ConfirmCards(1-tp,g)
 		end
 	end
