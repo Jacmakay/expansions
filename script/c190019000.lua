@@ -6,7 +6,7 @@ function s.initial_effect(c)
  local e1=aux.AddNormalSummonProcedure(c,true,true,1,1,SUMMON_TYPE_TRIBUTE,aux.Stringid(id,0),s.cfilter)
  -- change battle position also shuffle a backrow
  local e1=Effect.CreateEffect(c)
- 	e1:SetDescription(aux.Stringid(id,1))
+ 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_POSITION+CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
