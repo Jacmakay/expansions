@@ -76,14 +76,76 @@ function s.costcheck(g,tp)
     return #rg>0
 end
 
+-- Compatibility: enumerate legal groups of exactly three cards without
+-- Group.CheckSubGroup / Group.SelectSubGroup, which are not present in
+-- some older Rush Duel simulator cores.
+function s.getvalidtriples(g,tp)
+    local cards={}
+    local tc=g:GetFirst()
+    while tc do
+        cards[#cards+1]=tc
+        tc=g:GetNext()
+    end
+    local triples={}
+    for i=1,#cards-2 do
+        for j=i+1,#cards-1 do
+            for k=j+1,#cards do
+                local test=Group.CreateGroup()
+                test:AddCard(cards[i])
+                test:AddCard(cards[j])
+                test:AddCard(cards[k])
+                if s.costcheck(test,tp) then
+                    triples[#triples+1]={cards[i],cards[j],cards[k]}
+                end
+            end
+        end
+    end
+    return triples
+end
+
+-- Let the player pick each card, showing only selections that can still
+-- complete a legal Fiend / Spellcaster / Fairy group of three.
+function s.selectcost(triples,tp)
+    local selected=Group.CreateGroup()
+    local remaining=triples
+    for step=1,3 do
+        local options=Group.CreateGroup()
+        for _,triple in ipairs(remaining) do
+            for _,tc in ipairs(triple) do
+                if not selected:IsContains(tc) then
+                    options:AddCard(tc)
+                end
+            end
+        end
+        if #options==0 then return nil end
+        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+        local pick=options:Select(tp,1,1,nil)
+        if not pick or #pick==0 then return nil end
+        local chosen=pick:GetFirst()
+        selected:AddCard(chosen)
+
+        local nextremaining={}
+        for _,triple in ipairs(remaining) do
+            for _,tc in ipairs(triple) do
+                if tc==chosen then
+                    nextremaining[#nextremaining+1]=triple
+                    break
+                end
+            end
+        end
+        remaining=nextremaining
+    end
+    return selected
+end
+
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
     local g=Duel.GetMatchingGroup(s.costfilter,tp,LOCATION_GRAVE,0,nil)
+    local triples=s.getvalidtriples(g,tp)
     if chk==0 then
-        return g:CheckSubGroup(s.costcheck,3,3,tp)
+        return #triples>0
     end
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-    local sg=g:SelectSubGroup(tp,s.costcheck,false,3,3,tp)
-    if sg then
+    local sg=s.selectcost(triples,tp)
+    if sg and #sg==3 then
         Duel.SendtoDeck(sg,nil,SEQ_DECKSHUFFLE,REASON_COST)
     end
 end
