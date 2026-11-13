@@ -65,7 +65,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
     Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,1-tp,LOCATION_ONFIELD)
 end
 
-function s.bwfilter(c)
+-- Field-wide filter: this is evaluated continuously, so new Beast-Warriors
+-- that appear AFTER activation also receive both effects while face-up.
+function s.bwfilter(e,c)
     return c:IsFaceup() and c:IsMonster()
         and c:IsRace(RACE_BEASTWARRIOR)
 end
@@ -79,29 +81,31 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
         tp,0,LOCATION_ONFIELD,1,1,nil)
     if #dg==0 or Duel.Destroy(dg,REASON_EFFECT)==0 then return end
 
-    -- "Then": the group-wide benefits apply only if a card was destroyed.
-    -- Applies to monsters CURRENTLY face-up on either field.
-    local g=Duel.GetMatchingGroup(s.bwfilter,
-        tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+    -- "Then": only create the field-wide bonuses after a successful destroy.
+    -- Because these are DUEL-REGISTERED field effects, they keep applying to
+    -- ALL face-up Beast-Warriors on BOTH fields, including those summoned
+    -- later, even if Emir Phoenix Mode subsequently leaves the field.
+    -- The 2 End Phase reset lasts through the end of the opponent's turn.
+    local reset=RESET_PHASE|PHASE_END
 
-    -- Ignition effects happen on your turn: your End Phase and then
-    -- your opponent's End Phase = 2 End Phase resets.
-    local reset=RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END
-    for tc in aux.Next(g) do
-        if not tc:IsImmuneToEffect(e) then
-            local e1=Effect.CreateEffect(e:GetHandler())
-            e1:SetType(EFFECT_TYPE_SINGLE)
-            e1:SetCode(EFFECT_UPDATE_ATTACK)
-            e1:SetValue(1000)
-            e1:SetReset(reset,2)
-            tc:RegisterEffect(e1)
+    -- +1000 ATK to every face-up Beast-Warrior on either field.
+    local e1=Effect.CreateEffect(e:GetHandler())
+    e1:SetType(EFFECT_TYPE_FIELD)
+    e1:SetCode(EFFECT_UPDATE_ATTACK)
+    e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+    e1:SetTarget(s.bwfilter)
+    e1:SetValue(1000)
+    e1:SetReset(reset,2)
+    Duel.RegisterEffect(e1,tp)
 
-            local e2=Effect.CreateEffect(e:GetHandler())
-            e2:SetType(EFFECT_TYPE_SINGLE)
-            e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-            e2:SetValue(1)
-            e2:SetReset(reset,2)
-            tc:RegisterEffect(e2)
-        end
-    end
+    -- All face-up Beast-Warriors on either field cannot be destroyed
+    -- by card effects, including newly summoned Beast-Warriors.
+    local e2=Effect.CreateEffect(e:GetHandler())
+    e2:SetType(EFFECT_TYPE_FIELD)
+    e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+    e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+    e2:SetTarget(s.bwfilter)
+    e2:SetValue(1)
+    e2:SetReset(reset,2)
+    Duel.RegisterEffect(e2,tp)
 end
