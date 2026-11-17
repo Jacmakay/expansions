@@ -4,7 +4,10 @@
 -- WARNING: This is a best-effort physical board/zone snapshot restoration,
 -- NOT a true engine rewind. See notes below.
 
-local s,id=GetID()
+-- Use the known card ID explicitly. Some custom EDOPro loaders return nil from GetID().
+c190019445 = c190019445 or {}
+local s = c190019445
+local id = 190019445
 
 local TRACKED_LOCATIONS=LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE
     |LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA
